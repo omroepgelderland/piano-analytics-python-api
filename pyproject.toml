@@ -3,7 +3,11 @@ name = "piano_analytics_api"
 authors = [
   { name="Remy Glaser", email="rglaser@gld.nl" },
 ]
-description = "Python implementation for the Piano Reporting API"
+description = "Python implementation for the Piano Anaytics Reporting API (formerly ‘At Internet’)"
+keywords = [
+  "piano analytics",
+  "at internet"
+]
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
