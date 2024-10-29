@@ -16,7 +16,7 @@ You can use **Pip** or **Download the Release**
 The preferred method is via [the Python package index](https://pypi.org/).
 
 ```sh
-pip install -i https://test.pypi.org/simple/ piano-analytics-api
+pip3 install piano-analytics-api
 ```
 
 ## Usage example
