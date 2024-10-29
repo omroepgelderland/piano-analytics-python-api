@@ -1,0 +1,45 @@
+[project]
+name = "piano_analytics_api"
+authors = [
+  { name="Remy Glaser", email="rglaser@gld.nl" },
+]
+description = "Python implementation for the Piano Reporting API"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = []
+dynamic = ["version", "urls"]
+
+[tool.hatch.metadata.hooks.vcs.urls]
+Homepage = "https://github.com/omroepgelderland/piano-analytics-python-api"
+Issues = "https://github.com/omroepgelderland/piano-analytics-python-api/issues"
+source_archive = "https://github.com/omroepgelderland/piano-analytics-python-api/archive/{commit_hash}.zip"
+
+[tool.hatch.metadata.hooks.vcs]
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/piano_analytics_api/_version.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/dist",
+  "/env",
+  "/.git",
+  "__pycache__",
+  "/_test.py",
+  "/.vscode"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/piano_analytics_api"]
