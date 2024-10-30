@@ -2,15 +2,16 @@ from abc import ABC, abstractmethod
 from datetime import date
 from typing import Any, TypeVar, Union, cast
 
-_ExpressionType = Union[int,str,bool,date,list[int],list[str],list[date]]
+_ExpressionType = Union[int, str, bool, date, list[int], list[str], list[date]]
 
-_ExpressionFormattedType = Union[int,str,bool,list[int],list[str]]
+_ExpressionFormattedType = Union[int, str, bool, list[int], list[str]]
 
 _EndpointDictType = dict[str, dict[str, _ExpressionFormattedType]]
 
-_ListDictType = dict[str, list['DictType']]
+_ListDictType = dict[str, list["DictType"]]
 
 DictType = Union[_EndpointDictType, _ListDictType]
+
 
 class Filter(ABC):
     """
@@ -81,9 +82,7 @@ class _Endpoint(Filter):
     """
 
     @abstractmethod
-    def __init__(
-        self, field: str, operator: str, expression: _ExpressionType
-    ):
+    def __init__(self, field: str, operator: str, expression: _ExpressionType):
         """
         :param field: Property or metric to compare.
         :param operator: Comparison operator.
@@ -95,80 +94,102 @@ class _Endpoint(Filter):
 
     def format(self) -> _EndpointDictType:
         if type(self._expression) is list:
-            expression = cast(Union[list[int],list[str]], list(map(_cast_date, self._expression)))
+            expression = cast(
+                Union[list[int], list[str]], list(map(_cast_date, self._expression))
+            )
         else:
-            c_expression = cast(Union[int,str,bool,date], self._expression)
+            c_expression = cast(Union[int, str, bool, date], self._expression)
             expression = _cast_date(c_expression)
         return {self._field: {self._operator: expression}}
-    
+
+
 class Equals(_Endpoint):
-    def __init__(self, field: str, expression: Union[int,str,date]):
-        super().__init__(field, '$eq', expression)
-    
+    def __init__(self, field: str, expression: Union[int, str, date]):
+        super().__init__(field, "$eq", expression)
+
+
 class NotEquals(_Endpoint):
-    def __init__(self, field: str, expression: Union[int,str,date]):
-        super().__init__(field, '$neq', expression)
+    def __init__(self, field: str, expression: Union[int, str, date]):
+        super().__init__(field, "$neq", expression)
+
 
 class In(_Endpoint):
-    def __init__(self, field: str, expression: Union[list[int],list[str],list[date]]):
-        super().__init__(field, '$in', expression)
+    def __init__(self, field: str, expression: Union[list[int], list[str], list[date]]):
+        super().__init__(field, "$in", expression)
+
 
 class NotIn(_Endpoint):
-    def __init__(self, field: str, expression: Union[list[int],list[str],list[date]]):
-        super().__init__(field, '$nin', expression)
+    def __init__(self, field: str, expression: Union[list[int], list[str], list[date]]):
+        super().__init__(field, "$nin", expression)
+
 
 class Greater(_Endpoint):
-    def __init__(self, field: str, expression: Union[int,date]):
-        super().__init__(field, '$gt', expression)
+    def __init__(self, field: str, expression: Union[int, date]):
+        super().__init__(field, "$gt", expression)
+
 
 class GreaterOrEqual(_Endpoint):
-    def __init__(self, field: str, expression: Union[int,date]):
-        super().__init__(field, '$gte', expression)
+    def __init__(self, field: str, expression: Union[int, date]):
+        super().__init__(field, "$gte", expression)
+
 
 class Less(_Endpoint):
-    def __init__(self, field: str, expression: Union[int,date]):
-        super().__init__(field, '$lt', expression)
+    def __init__(self, field: str, expression: Union[int, date]):
+        super().__init__(field, "$lt", expression)
+
 
 class LessOrEqual(_Endpoint):
-    def __init__(self, field: str, expression: Union[int,date]):
-        super().__init__(field, '$lte', expression)
+    def __init__(self, field: str, expression: Union[int, date]):
+        super().__init__(field, "$lte", expression)
+
 
 class Contains(_Endpoint):
-    def __init__(self, field: str, expression: Union[str,list[str]]):
-        super().__init__(field, '$lk', expression)
+    def __init__(self, field: str, expression: Union[str, list[str]]):
+        super().__init__(field, "$lk", expression)
+
 
 class NotContains(_Endpoint):
-    def __init__(self, field: str, expression: Union[str,list[str]]):
-        super().__init__(field, '$nlk', expression)
+    def __init__(self, field: str, expression: Union[str, list[str]]):
+        super().__init__(field, "$nlk", expression)
+
 
 class StartsWith(_Endpoint):
-    def __init__(self, field: str, expression: Union[str,list[str]]):
-        super().__init__(field, '$start', expression)
+    def __init__(self, field: str, expression: Union[str, list[str]]):
+        super().__init__(field, "$start", expression)
+
 
 class NotStartsWith(_Endpoint):
-    def __init__(self, field: str, expression: Union[str,list[str]]):
-        super().__init__(field, '$nstart', expression)
+    def __init__(self, field: str, expression: Union[str, list[str]]):
+        super().__init__(field, "$nstart", expression)
+
 
 class EndsWith(_Endpoint):
-    def __init__(self, field: str, expression: Union[str,list[str]]):
-        super().__init__(field, '$end', expression)
+    def __init__(self, field: str, expression: Union[str, list[str]]):
+        super().__init__(field, "$end", expression)
+
 
 class NotEndsWith(_Endpoint):
-    def __init__(self, field: str, expression: Union[str,list[str]]):
-        super().__init__(field, '$nend', expression)
+    def __init__(self, field: str, expression: Union[str, list[str]]):
+        super().__init__(field, "$nend", expression)
+
 
 class IsNull(_Endpoint):
     def __init__(self, field: str, expression: bool):
-        super().__init__(field, '$na', expression)
+        super().__init__(field, "$na", expression)
+
 
 class IsUndefined(_Endpoint):
     def __init__(self, field: str, expression: bool):
-        super().__init__(field, '$undefined', expression)
+        super().__init__(field, "$undefined", expression)
+
 
 class IsEmpty(_Endpoint):
     def __init__(self, field: str, expression: bool):
-        super().__init__(field, '$empty', expression)
+        super().__init__(field, "$empty", expression)
 
-T = TypeVar('T')
-def _cast_date(arg: Union[T,date]) -> Union[T,str]:
+
+T = TypeVar("T")
+
+
+def _cast_date(arg: Union[T, date]) -> Union[T, str]:
     return arg.strftime("%Y-%m-%d") if isinstance(arg, date) else arg

@@ -22,9 +22,7 @@ def get_max_request():
                 pfilter.GreaterOrEqual("article_id", 5),
             ),
             pfilter.IsEmpty("article_id", False),
-            pfilter.Contains(
-                "domain", ["example.org", "www.example.org"]
-            ),
+            pfilter.Contains("domain", ["example.org", "www.example.org"]),
         ),
         metric_filter=pfilter.Greater("m_visits", 1),
         evolution=Evolution(),
@@ -80,7 +78,7 @@ def test_max_request():
 
 def test_format_totals():
     request = get_max_request()
-    assert request._format_totals() == { # type: ignore
+    assert request._format_totals() == {  # type: ignore
         "space": {"s": [0]},
         "columns": ["page"],
         "period": {

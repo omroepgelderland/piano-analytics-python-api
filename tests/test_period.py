@@ -17,11 +17,13 @@ def test_time_period():
     p = period.DayPeriod(
         datetime(1999, 12, 31, 0, 0, 0), datetime(1999, 12, 31, 23, 40, 50)
     )
-    assert p.format() == [{
-        "type": "D",
-        "start": "1999-12-31 00:00:00",
-        "end": "1999-12-31 23:40:50",
-    }]
+    assert p.format() == [
+        {
+            "type": "D",
+            "start": "1999-12-31 00:00:00",
+            "end": "1999-12-31 23:40:50",
+        }
+    ]
 
 
 def test_month_period():

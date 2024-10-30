@@ -8,12 +8,15 @@ class _SingleDayDictType(TypedDict):
     start: str
     end: str
 
-RelativeGranularity = Literal['Y', 'Q', 'M', 'W', 'D']
+
+RelativeGranularity = Literal["Y", "Q", "M", "W", "D"]
+
 
 class _SingleRelativeDictType(TypedDict):
     type: Literal["R"]
     granularity: RelativeGranularity
     offset: int
+
 
 DayDictType = list[_SingleDayDictType]
 
@@ -43,6 +46,7 @@ class _AbsolutePeriod(Period):
     """
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/period#absolute-periods
     """
+
     pass
 
 
@@ -50,6 +54,7 @@ class DayPeriod(_AbsolutePeriod):
     """
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/period#absolute-periods
     """
+
     def __init__(
         self,
         start: Union[datetime.date, datetime.datetime],
@@ -83,7 +88,7 @@ class DayPeriod(_AbsolutePeriod):
                 "end": end_str,
             }
         ]
-    
+
 
 class RelativePeriod(Period):
     """
@@ -107,4 +112,3 @@ def today():
     Creates a period for only the current day.
     """
     return DayPeriod(datetime.date.today(), datetime.date.today())
-

@@ -25,6 +25,7 @@ class _DataFeedType(TypedDict):
 class _RowCountType(TypedDict):
     RowCount: int
 
+
 class _APIResponseType(TypedDict, total=False):
     DataFeed: _DataFeedType
     RowCounts: list[_RowCountType]
@@ -35,39 +36,51 @@ class _APIResponseType(TypedDict, total=False):
 class EvolutionDictType(TypedDict):
     pass
 
+
 class _RequestSpaceType(TypedDict):
     s: list[int]
 
+
 class _RequestPeriodsDictTypeNotRequired(TypedDict, total=False):
-    p2: 'period.PeriodDictType'
+    p2: "period.PeriodDictType"
+
 
 class _RequestPeriodsDictType(_RequestPeriodsDictTypeNotRequired):
     p1: period.PeriodDictType
 
+
 class _RequestOptionsType(TypedDict):
     ignore_null_properties: bool
+
 
 class _RequestFiltersType(TypedDict, total=False):
     metric: pfilter.DictType
     property: pfilter.DictType
 
-_RequestDictTypeRequired = TypedDict('_RequestDictTypeRequired', {
-    'space': _RequestSpaceType,
-    'columns': list[str],
-    'period': _RequestPeriodsDictType,
-    'max-results': int,
-    'page-num': int,
-    'options': _RequestOptionsType
-})
+
+_RequestDictTypeRequired = TypedDict(
+    "_RequestDictTypeRequired",
+    {
+        "space": _RequestSpaceType,
+        "columns": list[str],
+        "period": _RequestPeriodsDictType,
+        "max-results": int,
+        "page-num": int,
+        "options": _RequestOptionsType,
+    },
+)
+
 
 class _RequestDictType(_RequestDictTypeRequired, total=False):
     filter: _RequestFiltersType
     evo: EvolutionDictType
     sort: list[str]
 
+
 class _RequestTotalsTypeNotRequired(TypedDict, total=False):
     filter: _RequestFiltersType
     evo: EvolutionDictType
+
 
 class _RequestTotalsType(_RequestTotalsTypeNotRequired):
     space: _RequestSpaceType
@@ -81,6 +94,7 @@ MAX_PAGE_RESULTS: Final[Literal[10000]] = 10000
 """Maximum number of pages in a request."""
 MAX_PAGES: Final[Literal[20]] = 20
 
+
 class Evolution(object):
     """
     @todo implementeren
@@ -88,6 +102,7 @@ class Evolution(object):
 
     def format(self) -> EvolutionDictType:
         return {}
+
 
 class Client(object):
     def __init__(self, access_key: str, secret_key: str):
@@ -99,7 +114,11 @@ class Client(object):
         self._access_key = access_key
         self._secret_key = secret_key
 
-    def request(self, method: str, request: Union['Request', _RequestDictType, _RequestTotalsType]) -> _APIResponseType:
+    def request(
+        self,
+        method: str,
+        request: Union["Request", _RequestDictType, _RequestTotalsType],
+    ) -> _APIResponseType:
         """
         Execute an API request.
         :param method: API method.
@@ -125,16 +144,20 @@ class Client(object):
 
         error_message = None
         error_type = None
-        if 'ErrorMessage' in data:
-            error_message = data['ErrorMessage']
-        if 'ErrorType' in data:
-            error_type = data['ErrorType']
+        if "ErrorMessage" in data:
+            error_message = data["ErrorMessage"]
+        if "ErrorType" in data:
+            error_type = data["ErrorType"]
 
         if http_status >= 400 or error_message is not None or error_type is not None:
-            error_message = f'{error_type}: {error_message}' if error_type is not None else error_message
+            error_message = (
+                f"{error_type}: {error_message}"
+                if error_type is not None
+                else error_message
+            )
             error = APIException(error_message, http_status, error_type)
             raise error
-        
+
         return data
 
     def _get_headers(self) -> "dict[str, str]":
@@ -194,18 +217,12 @@ class Request(object):
 
     def format(self) -> _RequestDictType:
         dict: _RequestDictType = {
-            "space": {
-                "s": self._sites
-            },
+            "space": {"s": self._sites},
             "columns": self._columns,
-            "period": {
-                "p1": self._period.format()
-            },
+            "period": {"p1": self._period.format()},
             "max-results": self._get_max_page_results(),
             "page-num": self._page_num,
-            "options": {
-                "ignore_null_properties": self._ignore_null_properties
-            }
+            "options": {"ignore_null_properties": self._ignore_null_properties},
         }
         if self._cmp_period is not None:
             dict["period"]["p2"] = self._cmp_period.format()
@@ -217,17 +234,17 @@ class Request(object):
         if len(self._sort) > 0:
             dict["sort"] = self._sort
         return dict
-    
+
     def _format_totals(self) -> _RequestTotalsType:
         """
         Serialization without some properties for getRowCount and getTotal queries.
         """
         response = cast(_RequestTotalsType, self.format())
-        del response['sort'] # type: ignore
-        del response['max-results'] # type: ignore
-        del response['page-num'] # type: ignore
+        del response["sort"]  # type: ignore
+        del response["max-results"]  # type: ignore
+        del response["page-num"]  # type: ignore
         return response
-    
+
     def _format_filters(self) -> _RequestFiltersType:
         """
         Format the filters for serialization.
@@ -239,7 +256,7 @@ class Request(object):
             response["property"] = self._property_filter.format()
         return response
 
-    def get_result_pages(self) -> 'ResultPageList':
+    def get_result_pages(self) -> "ResultPageList":
         """
         Execute a query and return a result object with multiple pages of responses from the API.
         Use ATInternet::get_result_rows() to get results without having to deal with paging.
@@ -256,25 +273,25 @@ class Request(object):
         :raises APIException
         """
         self._page_num = page_num
-        return self._client.request('getData', self)
-    
-    def get_result_rows(self) -> 'ResultRowList':
+        return self._client.request("getData", self)
+
+    def get_result_rows(self) -> "ResultRowList":
         """
         Execute the query and return a result object with all rows from the API.
         https://developers.atinternet-solutions.com/piano-analytics/data-api/technical-information/methods#getdata
         """
         return ResultRowList(self)
-    
+
     def get_rowcount(self) -> int:
         """
         Returns the number of results for a query. max_results is ignored.
         https://developers.atinternet-solutions.com/piano-analytics/data-api/technical-information/methods#getrowcount
         :raises APIException
         """
-        rowcount_raw = self._client.request('getRowCount', self._format_totals())
-        if 'RowCounts' not in rowcount_raw:
-            raise PianoAnalyticsException('Key RowCounts missing in response')
-        return rowcount_raw['RowCounts'][0]['RowCount']
+        rowcount_raw = self._client.request("getRowCount", self._format_totals())
+        if "RowCounts" not in rowcount_raw:
+            raise PianoAnalyticsException("Key RowCounts missing in response")
+        return rowcount_raw["RowCounts"][0]["RowCount"]
 
     def get_total(self) -> dict[str, Any]:
         """
@@ -282,18 +299,24 @@ class Request(object):
         https://developers.atinternet-solutions.com/piano-analytics/data-api/technical-information/methods#gettotal
         :raises APIException
         """
-        total_raw = self._client.request('getTotal', self._format_totals())
-        if 'DataFeed' not in total_raw:
-            raise PianoAnalyticsException('Key DataFeed missing in response')
-        data = total_raw['DataFeed']['Rows'][0]
-        return {k: v for k, v in data.items() if v != '-'}
-    
+        total_raw = self._client.request("getTotal", self._format_totals())
+        if "DataFeed" not in total_raw:
+            raise PianoAnalyticsException("Key DataFeed missing in response")
+        data = total_raw["DataFeed"]["Rows"][0]
+        return {k: v for k, v in data.items() if v != "-"}
+
     def _get_max_page_results(self) -> int:
         """
         Get the maximum number of results for the current page.
         """
-        return max(0,min(MAX_PAGE_RESULTS, self._max_results-MAX_PAGE_RESULTS*(self._page_num-1)))
-    
+        return max(
+            0,
+            min(
+                MAX_PAGE_RESULTS,
+                self._max_results - MAX_PAGE_RESULTS * (self._page_num - 1),
+            ),
+        )
+
     def is_after_last_page(self, page_num: int) -> bool:
         """
         Returns true if the current page is the page after the last page that contains results.
@@ -301,12 +324,13 @@ class Request(object):
         """
         self._page_num = page_num
         return self._get_max_page_results() == 0
-    
+
 
 class ResultPageList(object):
     """
     Iterable set of pages with data results.
     """
+
     def __init__(self, request: Request):
         """
         :param request: Data request
@@ -321,9 +345,10 @@ class ResultPageList(object):
     def __next__(self) -> _APIResponseType:
         data = self._request.get_result_page(self._page_index)
         self._page_index += 1
-        if 'DataFeed' not in data or len(data["DataFeed"]["Rows"]) == 0:
+        if "DataFeed" not in data or len(data["DataFeed"]["Rows"]) == 0:
             raise StopIteration
         return data
+
 
 class ResultRowList:
     """
@@ -339,13 +364,13 @@ class ResultRowList:
         self._row_index: int = 0
         self._total_index: int = 0
 
-    def __iter__(self) -> 'ResultRowList':
+    def __iter__(self) -> "ResultRowList":
         self._result_pages.__iter__()
         self._rows = None
         self._row_index = 0
         self._total_index = 0
         return self
-    
+
     def __next__(self) -> dict[str, Any]:
         data = self._get_rows()[self._row_index]
         self._row_index += 1
@@ -355,14 +380,13 @@ class ResultRowList:
             self._row_index = 0
         return data
 
-    
     def _get_rows(self):
         if self._rows is None:
             page = self._result_pages.__next__()
-            if 'DataFeed' not in page:
-                raise PianoAnalyticsException('Key DataFeed missing in response')
+            if "DataFeed" not in page:
+                raise PianoAnalyticsException("Key DataFeed missing in response")
             self._rows = page["DataFeed"]["Rows"]
         return self._rows
-    
+
     def _get_row_count(self) -> int:
         return len(self._get_rows())
