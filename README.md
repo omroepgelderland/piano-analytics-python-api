@@ -52,20 +52,12 @@ request = Request(
     sort = [
         '-m_visits'
     ],
-    property_filter= pfilter.ListAnd(
-        pfilter.Endpoint(
-            'page',
-            pfilter.IS_EMPTY,
-            False
-        ),
-        pfilter.Endpoint(
-            'domain',
-            pfilter.CONTAINS,
-            [
-                'example.com',
-                'www.example.com'
-            ]
-        )
+    property_filter = pfilter.ListAnd(
+        pfilter.IsEmpty('page', False),
+        pfilter.Contains('domain',[
+            'example.com',
+            'www.example.com'
+        ])
     )
 )
 

@@ -17,15 +17,15 @@ def get_max_request():
         ),
         property_filter=pfilter.ListOr(
             pfilter.ListAnd(
-                pfilter.Endpoint("page", pfilter.CONTAINS, "a"),
-                pfilter.Endpoint("article_id", pfilter.GREATER_OR_EQUAL, 5),
+                pfilter.Contains("page", "a"),
+                pfilter.GreaterOrEqual("article_id", 5),
             ),
-            pfilter.Endpoint("article_id", pfilter.IS_EMPTY, False),
-            pfilter.Endpoint(
-                "domain", pfilter.CONTAINS, ["example.org", "www.example.org"]
+            pfilter.IsEmpty("article_id", False),
+            pfilter.Contains(
+                "domain", ["example.org", "www.example.org"]
             ),
         ),
-        metric_filter=pfilter.Endpoint("m_visits", pfilter.GREATER, 1),
+        metric_filter=pfilter.Greater("m_visits", 1),
         evolution=Evolution(),
         sort=["-m_visits", "page"],
         max_results=100,

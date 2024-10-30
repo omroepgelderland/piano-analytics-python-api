@@ -1,12 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import Any, Union, Final, Literal
-import datetime
+from typing import Any, Union, cast, TypeVar
+from datetime import date
 
-EndpointDictType = dict[str, dict[str, Any]]
+_ExpressionType = Union[int,str,bool,date,list[int],list[str],list[date]]
 
-ListDictType = dict[str, list['DictType']]
+_ExpressionFormattedType = Union[int,str,bool,list[int],list[str]]
 
-DictType = Union[EndpointDictType, ListDictType]
+_EndpointDictType = dict[str, dict[str, _ExpressionFormattedType]]
+
+_ListDictType = dict[str, list['DictType']]
+
+DictType = Union[_EndpointDictType, _ListDictType]
 
 class Filter(ABC):
     """
@@ -21,7 +25,7 @@ class Filter(ABC):
         pass
 
 
-class List(Filter):
+class _List(Filter):
     """
     Abstract class
 
@@ -39,7 +43,7 @@ class List(Filter):
     def _get_operator(self) -> str:
         pass
 
-    def format(self) -> ListDictType:
+    def format(self) -> _ListDictType:
         return {self._get_operator(): self._get_formatted_filters()}
 
     def _get_formatted_filters(self):
@@ -49,7 +53,7 @@ class List(Filter):
         return lijst
 
 
-class ListAnd(List):
+class ListAnd(_List):
     """
     List of filters combined by AND.
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/filter
@@ -59,7 +63,7 @@ class ListAnd(List):
         return "$AND"
 
 
-class ListOr(List):
+class ListOr(_List):
     """
     List of filters combined by OR.
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/filter
@@ -69,15 +73,16 @@ class ListOr(List):
         return "$OR"
 
 
-class Endpoint(Filter):
+class _Endpoint(Filter):
     """
     Represents a filter statement.
 
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/filter
     """
 
+    @abstractmethod
     def __init__(
-        self, field: str, operator: str, expression: Any
+        self, field: str, operator: str, expression: _ExpressionType
     ):
         """
         :param field: Property or metric to compare.
@@ -88,53 +93,82 @@ class Endpoint(Filter):
         self._operator = operator
         self._expression = expression
 
-    def format(self) -> EndpointDictType:
-        if isinstance(self._expression, datetime.datetime):
-            expression = self._expression.strftime("%Y-%m-%d %H:%M:%S")
-        elif isinstance(self._expression, datetime.date):
-            expression = self._expression.strftime("%Y-%m-%d")
+    def format(self) -> _EndpointDictType:
+        if type(self._expression) is list:
+            expression = cast(Union[list[int],list[str]], list(map(_cast_date, self._expression)))
         else:
-            expression = self._expression
+            c_expression = cast(Union[int,str,bool,date], self._expression)
+            expression = _cast_date(c_expression)
         return {self._field: {self._operator: expression}}
+    
+class Equals(_Endpoint):
+    def __init__(self, field: str, expression: Union[int,str,date]):
+        super().__init__(field, '$eq', expression)
+    
+class NotEquals(_Endpoint):
+    def __init__(self, field: str, expression: Union[int,str,date]):
+        super().__init__(field, '$neq', expression)
 
+class In(_Endpoint):
+    def __init__(self, field: str, expression: Union[list[int],list[str],list[date]]):
+        super().__init__(field, '$in', expression)
 
-"""Filter for integers, strings, dates and booleans"""
-EQUALS: Final[Literal["$eq"]] = '$eq'
-"""Filter for integers, string and booleans"""
-NOT_EQUALS: Final[Literal["$neq"]] = '$neq'
-"""Filter for integers and strings"""
-IN_ARRAY: Final[Literal["$in"]] = '$in'
-"""Filter for integers and dates"""
-GREATER: Final[Literal["$gt"]] = '$gt'
-"""Filter for integers and dates"""
-GREATER_OR_EQUAL: Final[Literal["$gte"]] = '$gte'
-"""Filter for integers and dates"""
-LOWER: Final[Literal["$lt"]] = '$lt'
-"""Filter for integers and dates"""
-LOWER_OR_EQUAL: Final[Literal["$lte"]] = '$lte'
-"""Filter for integers, strings and booleans"""
-IS_NULL: Final[Literal["$na"]] = '$na'
-"""Filter for integers, strings and booleans"""
-IS_UNDEFINED: Final[Literal["$undefined"]] = '$undefined'
-"""combination of IS_NULL and IS_UNDEFINED. Filter for integers, strings and booleans"""
-IS_EMPTY: Final[Literal["$empty"]] = '$empty'
-"""Filter for strings"""
-CONTAINS: Final[Literal["$lk"]] = '$lk'
-"""Filter for strings"""
-NOT_CONTAINS: Final[Literal["$nlk"]] = '$nlk'
-"""Filter for strings"""
-STARTS_WITH: Final[Literal["$start"]] = '$start'
-"""Filter for strings"""
-NOT_STARTS_WITH: Final[Literal["$nstart"]] = '$nstart'
-"""Filter for strings"""
-ENDS_WITH: Final[Literal["$end"]] = '$end'
-"""Filter for strings"""
-NOT_ENDS_WITH: Final[Literal["$nend"]] = '$nend'
-"""
-Compare a datetime field to the period of the analysis.
-Possible expressions:
-start: Is equal to the start of the time period
-end: Is equal to the end of the period.
-all: Is equal to the time period.
-"""
-PERIOD: Final[Literal["$period"]] = '$period'
+class NotIn(_Endpoint):
+    def __init__(self, field: str, expression: Union[list[int],list[str],list[date]]):
+        super().__init__(field, '$nin', expression)
+
+class Greater(_Endpoint):
+    def __init__(self, field: str, expression: Union[int,date]):
+        super().__init__(field, '$gt', expression)
+
+class GreaterOrEqual(_Endpoint):
+    def __init__(self, field: str, expression: Union[int,date]):
+        super().__init__(field, '$gte', expression)
+
+class Less(_Endpoint):
+    def __init__(self, field: str, expression: Union[int,date]):
+        super().__init__(field, '$lt', expression)
+
+class LessOrEqual(_Endpoint):
+    def __init__(self, field: str, expression: Union[int,date]):
+        super().__init__(field, '$lte', expression)
+
+class Contains(_Endpoint):
+    def __init__(self, field: str, expression: Union[str,list[str]]):
+        super().__init__(field, '$lk', expression)
+
+class NotContains(_Endpoint):
+    def __init__(self, field: str, expression: Union[str,list[str]]):
+        super().__init__(field, '$nlk', expression)
+
+class StartsWith(_Endpoint):
+    def __init__(self, field: str, expression: Union[str,list[str]]):
+        super().__init__(field, '$start', expression)
+
+class NotStartsWith(_Endpoint):
+    def __init__(self, field: str, expression: Union[str,list[str]]):
+        super().__init__(field, '$nstart', expression)
+
+class EndsWith(_Endpoint):
+    def __init__(self, field: str, expression: Union[str,list[str]]):
+        super().__init__(field, '$end', expression)
+
+class NotEndsWith(_Endpoint):
+    def __init__(self, field: str, expression: Union[str,list[str]]):
+        super().__init__(field, '$nend', expression)
+
+class IsNull(_Endpoint):
+    def __init__(self, field: str, expression: bool):
+        super().__init__(field, '$na', expression)
+
+class IsUndefined(_Endpoint):
+    def __init__(self, field: str, expression: bool):
+        super().__init__(field, '$undefined', expression)
+
+class IsEmpty(_Endpoint):
+    def __init__(self, field: str, expression: bool):
+        super().__init__(field, '$empty', expression)
+
+T = TypeVar('T')
+def _cast_date(arg: Union[T,date]) -> Union[T,str]:
+    return arg.strftime("%Y-%m-%d") if isinstance(arg, date) else arg

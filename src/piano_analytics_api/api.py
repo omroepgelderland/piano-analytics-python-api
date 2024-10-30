@@ -7,7 +7,7 @@ from . import period
 from . import pfilter
 
 
-class DataFeedColumnType(TypedDict):
+class _DataFeedColumnType(TypedDict):
     Category: Literal["Dimension", "Metric"]
     Name: str
     Type: str
@@ -17,71 +17,64 @@ class DataFeedColumnType(TypedDict):
     Filterable: bool
 
 
-class DataFeedType(TypedDict):
-    Columns: "list[DataFeedColumnType]"
+class _DataFeedType(TypedDict):
+    Columns: "list[_DataFeedColumnType]"
     Rows: "list[dict[str, Any]]"
     Context: "dict[str, Any]"
 
 
-class RowCountType(TypedDict):
+class _RowCountType(TypedDict):
     RowCount: int
 
-class APIResponseType(TypedDict, total=False):
-    DataFeed: DataFeedType
-    RowCounts: list[RowCountType]
-
-
-class DataFeedContextType(TypedDict):
-    pass
-
-
-
-class APIErrorResponseType(TypedDict, total=False):
+class _APIResponseType(TypedDict, total=False):
+    DataFeed: _DataFeedType
+    RowCounts: list[_RowCountType]
     ErrorMessage: str
     ErrorType: str
+
 
 class EvolutionDictType(TypedDict):
     pass
 
-class RequestSpaceType(TypedDict):
+class _RequestSpaceType(TypedDict):
     s: list[int]
 
-class RequestPeriodsDictTypeNotRequired(TypedDict, total=False):
+class _RequestPeriodsDictTypeNotRequired(TypedDict, total=False):
     p2: 'period.PeriodDictType'
 
-class RequestPeriodsDictType(RequestPeriodsDictTypeNotRequired):
+class _RequestPeriodsDictType(_RequestPeriodsDictTypeNotRequired):
     p1: period.PeriodDictType
 
-class RequestOptionsType(TypedDict):
+class _RequestOptionsType(TypedDict):
     ignore_null_properties: bool
 
-class RequestFiltersType(TypedDict, total=False):
+class _RequestFiltersType(TypedDict, total=False):
     metric: pfilter.DictType
     property: pfilter.DictType
 
-RequestDictTypeRequired = TypedDict('RequestDictTypeRequired', {
-    'space': RequestSpaceType,
+_RequestDictTypeRequired = TypedDict('_RequestDictTypeRequired', {
+    'space': _RequestSpaceType,
     'columns': list[str],
-    'period': RequestPeriodsDictType,
+    'period': _RequestPeriodsDictType,
     'max-results': int,
     'page-num': int,
-    'options': RequestOptionsType
+    'options': _RequestOptionsType
 })
 
-class RequestDictType(RequestDictTypeRequired, total=False):
-    filter: RequestFiltersType
+class _RequestDictType(_RequestDictTypeRequired, total=False):
+    filter: _RequestFiltersType
     evo: EvolutionDictType
     sort: list[str]
 
-class RequestTotalsTypeNotRequired(TypedDict, total=False):
-    filter: RequestFiltersType
+class _RequestTotalsTypeNotRequired(TypedDict, total=False):
+    filter: _RequestFiltersType
     evo: EvolutionDictType
 
-class RequestTotalsType(RequestTotalsTypeNotRequired):
-    space: RequestSpaceType
+class _RequestTotalsType(_RequestTotalsTypeNotRequired):
+    space: _RequestSpaceType
     columns: list[str]
-    period: RequestPeriodsDictType
-    options: RequestOptionsType
+    period: _RequestPeriodsDictType
+    options: _RequestOptionsType
 
 
 """Maximum number of results in one page."""
@@ -107,7 +100,7 @@ class Client(object):
         self._access_key = access_key
         self._secret_key = secret_key
 
-    def request(self, method: str, request: Union['Request', RequestDictType, RequestTotalsType]) -> APIResponseType:
+    def request(self, method: str, request: Union['Request', _RequestDictType, _RequestTotalsType]) -> _APIResponseType:
         """
         Execute an API request.
         :param method: API method.
@@ -125,7 +118,7 @@ class Client(object):
         )
         with connection.getresponse() as response:
             response_raw = response.read()
-            data: Optional[APIResponseType] = json.loads(response_raw)
+            data: Optional[_APIResponseType] = json.loads(response_raw)
             http_status = response.status
 
         if data is None:
@@ -200,8 +193,8 @@ class Request(object):
         self._max_results = max_results
         self._ignore_null_properties = ignore_null_properties
 
-    def format(self) -> RequestDictType:
-        dict: RequestDictType = {
+    def format(self) -> _RequestDictType:
+        dict: _RequestDictType = {
             "space": {
                 "s": self._sites
             },
@@ -226,21 +219,21 @@ class Request(object):
             dict["sort"] = self._sort
         return dict
     
-    def _format_totals(self) -> RequestTotalsType:
+    def _format_totals(self) -> _RequestTotalsType:
         """
         Serialization without some properties for getRowCount and getTotal queries.
         """
-        response = cast(RequestTotalsType, self.format())
+        response = cast(_RequestTotalsType, self.format())
         del response['sort'] # type: ignore
         del response['max-results'] # type: ignore
         del response['page-num'] # type: ignore
         return response
     
-    def _format_filters(self) -> RequestFiltersType:
+    def _format_filters(self) -> _RequestFiltersType:
         """
         Format the filters for serialization.
         """
-        response: RequestFiltersType = {}
+        response: _RequestFiltersType = {}
         if self._metric_filter is not None:
             response["metric"] = self._metric_filter.format()
         if self._property_filter is not None:
@@ -255,7 +248,7 @@ class Request(object):
         """
         return ResultPageList(self)
 
-    def get_result_page(self, page_num: int) -> APIResponseType:
+    def get_result_page(self, page_num: int) -> _APIResponseType:
         """
         Execute a data query. Only one page of results is returned. This page may not include all data.
         Use ATInternet::get_result_pages() to get a more complete result.
@@ -326,7 +319,7 @@ class ResultPageList(object):
         self._page_index = 1
         return self
 
-    def __next__(self) -> APIResponseType:
+    def __next__(self) -> _APIResponseType:
         data = self._request.get_result_page(self._page_index)
         self._page_index += 1
         if 'DataFeed' not in data or len(data["DataFeed"]["Rows"]) == 0:

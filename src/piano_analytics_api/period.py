@@ -2,21 +2,21 @@ import datetime
 from typing import TypedDict, Literal, Final, Union, Optional
 from abc import ABC, abstractmethod
 
-class SingleDayDictType(TypedDict):
+class _SingleDayDictType(TypedDict):
     type: Literal["D"]
     start: str
     end: str
 
 RelativeGranularity = Literal['Y', 'Q', 'M', 'W', 'D']
 
-class SingleRelativeDictType(TypedDict):
+class _SingleRelativeDictType(TypedDict):
     type: Literal["R"]
     granularity: RelativeGranularity
     offset: int
 
-DayDictType = list[SingleDayDictType]
+DayDictType = list[_SingleDayDictType]
 
-RelativeDictType = list[SingleRelativeDictType]
+RelativeDictType = list[_SingleRelativeDictType]
 
 PeriodDictType = Union[DayDictType, RelativeDictType]
 
@@ -38,14 +38,14 @@ class Period(ABC):
         pass
 
 
-class AbsolutePeriod(Period):
+class _AbsolutePeriod(Period):
     """
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/period#absolute-periods
     """
     pass
 
 
-class DayPeriod(AbsolutePeriod):
+class DayPeriod(_AbsolutePeriod):
     """
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/period#absolute-periods
     """
