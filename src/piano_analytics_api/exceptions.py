@@ -1,5 +1,6 @@
 from typing import Optional
 
+
 class PianoAnalyticsException(Exception):
     """
     General exception for errors within the package.

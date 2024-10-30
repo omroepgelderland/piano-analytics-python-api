@@ -1,7 +1,8 @@
 import datetime
-from src.piano_analytics_api import Request, Client, Evolution
+
 import src.piano_analytics_api.period as period
 import src.piano_analytics_api.pfilter as pfilter
+from src.piano_analytics_api import Client, Evolution, Request
 
 
 def get_max_request():

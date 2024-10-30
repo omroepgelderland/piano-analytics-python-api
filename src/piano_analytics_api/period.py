@@ -1,6 +1,7 @@
 import datetime
-from typing import TypedDict, Literal, Final, Union, Optional
 from abc import ABC, abstractmethod
+from typing import Final, Literal, Optional, TypedDict, Union
+
 
 class _SingleDayDictType(TypedDict):
     type: Literal["D"]

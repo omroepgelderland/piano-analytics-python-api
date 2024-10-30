@@ -1,5 +1,7 @@
-import src.piano_analytics_api.pfilter as pfilter
 from datetime import date
+
+import src.piano_analytics_api.pfilter as pfilter
+
 
 def test_number_equals():
     f = pfilter.Equals('m_visits', 19)

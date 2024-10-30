@@ -1,10 +1,9 @@
 import http.client
 import json
-from typing import Any, Literal, Optional, TypedDict, Union, Final, cast
+from typing import Any, Final, Literal, Optional, TypedDict, Union, cast
 
+from . import period, pfilter
 from .exceptions import APIException, PianoAnalyticsException
-from . import period
-from . import pfilter
 
 
 class _DataFeedColumnType(TypedDict):

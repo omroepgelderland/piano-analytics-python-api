@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any, Union, cast, TypeVar
 from datetime import date
+from typing import Any, TypeVar, Union, cast
 
 _ExpressionType = Union[int,str,bool,date,list[int],list[str],list[date]]
 
