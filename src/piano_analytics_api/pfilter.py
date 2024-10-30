@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Union, Final
+from typing import Any, Union, Final, Literal
 import datetime
 
 EndpointDictType = dict[str, dict[str, Any]]
@@ -99,37 +99,37 @@ class Endpoint(Filter):
 
 
 """Filter for integers, strings, dates and booleans"""
-EQUALS: Final[str] = '$eq'
+EQUALS: Final[Literal["$eq"]] = '$eq'
 """Filter for integers, string and booleans"""
-NOT_EQUALS: Final[str] = '$neq'
+NOT_EQUALS: Final[Literal["$neq"]] = '$neq'
 """Filter for integers and strings"""
-IN_ARRAY: Final[str] = '$in'
+IN_ARRAY: Final[Literal["$in"]] = '$in'
 """Filter for integers and dates"""
-GREATER: Final[str] = '$gt'
+GREATER: Final[Literal["$gt"]] = '$gt'
 """Filter for integers and dates"""
-GREATER_OR_EQUAL: Final[str] = '$gte'
+GREATER_OR_EQUAL: Final[Literal["$gte"]] = '$gte'
 """Filter for integers and dates"""
-LOWER: Final[str] = '$lt'
+LOWER: Final[Literal["$lt"]] = '$lt'
 """Filter for integers and dates"""
-LOWER_OR_EQUAL: Final[str] = '$lte'
+LOWER_OR_EQUAL: Final[Literal["$lte"]] = '$lte'
 """Filter for integers, strings and booleans"""
-IS_NULL: Final[str] = '$na'
+IS_NULL: Final[Literal["$na"]] = '$na'
 """Filter for integers, strings and booleans"""
-IS_UNDEFINED: Final[str] = '$undefined'
+IS_UNDEFINED: Final[Literal["$undefined"]] = '$undefined'
 """combination of IS_NULL and IS_UNDEFINED. Filter for integers, strings and booleans"""
-IS_EMPTY: Final[str] = '$empty'
+IS_EMPTY: Final[Literal["$empty"]] = '$empty'
 """Filter for strings"""
-CONTAINS: Final[str] = '$lk'
+CONTAINS: Final[Literal["$lk"]] = '$lk'
 """Filter for strings"""
-NOT_CONTAINS: Final[str] = '$nlk'
+NOT_CONTAINS: Final[Literal["$nlk"]] = '$nlk'
 """Filter for strings"""
-STARTS_WITH: Final[str] = '$start'
+STARTS_WITH: Final[Literal["$start"]] = '$start'
 """Filter for strings"""
-NOT_STARTS_WITH: Final[str] = '$nstart'
+NOT_STARTS_WITH: Final[Literal["$nstart"]] = '$nstart'
 """Filter for strings"""
-ENDS_WITH: Final[str] = '$end'
+ENDS_WITH: Final[Literal["$end"]] = '$end'
 """Filter for strings"""
-NOT_ENDS_WITH: Final[str] = '$nend'
+NOT_ENDS_WITH: Final[Literal["$nend"]] = '$nend'
 """
 Compare a datetime field to the period of the analysis.
 Possible expressions:
@@ -137,4 +137,4 @@ start: Is equal to the start of the time period
 end: Is equal to the end of the period.
 all: Is equal to the time period.
 """
-PERIOD: Final[str] = '$period'
+PERIOD: Final[Literal["$period"]] = '$period'

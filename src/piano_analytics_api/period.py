@@ -1,5 +1,5 @@
 import datetime
-from typing import TypedDict, Literal, Final, Union
+from typing import TypedDict, Literal, Final, Union, Optional
 from abc import ABC, abstractmethod
 
 class SingleDayDictType(TypedDict):
@@ -21,11 +21,11 @@ RelativeDictType = list[SingleRelativeDictType]
 PeriodDictType = Union[DayDictType, RelativeDictType]
 
 
-YEAR: Final[str] = "Y"
-QUARTER: Final[str] = "Q"
-MONTH: Final[str] = "M"
-WEEK: Final[str] = "W"
-DAY: Final[str] = "D"
+YEAR: Final[Literal["Y"]] = "Y"
+QUARTER: Final[Literal["Q"]] = "Q"
+MONTH: Final[Literal["M"]] = "M"
+WEEK: Final[Literal["W"]] = "W"
+DAY: Final[Literal["D"]] = "D"
 
 
 class Period(ABC):
@@ -52,17 +52,17 @@ class DayPeriod(AbsolutePeriod):
     def __init__(
         self,
         start: Union[datetime.date, datetime.datetime],
-        end: Union[datetime.date, datetime.datetime],
+        end: Optional[Union[datetime.date, datetime.datetime]] = None,
     ):
         """
         Provide start and end as datetime.date objects to include data for the entire days.
         Provide start and end as datetime.datetime objects to include the time of day in the request.
 
         :param start: start of period.
-        :param end: end of period
+        :param end: end of period. If not specified the end date will be the same date as the start.
         """
         self._start = start
-        self._end = end
+        self._end = end if end is not None else start
 
     def format(self) -> DayDictType:
         start_str = (

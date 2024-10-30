@@ -85,10 +85,9 @@ class RequestTotalsType(RequestTotalsTypeNotRequired):
 
 
 """Maximum number of results in one page."""
-# MAX_PAGE_RESULTS: Final[int] = 10000
-MAX_PAGE_RESULTS: Final[int] = 501
+MAX_PAGE_RESULTS: Final[Literal[10000]] = 10000
 """Maximum number of pages in a request."""
-MAX_PAGES: Final[int] = 20
+MAX_PAGES: Final[Literal[20]] = 20
 
 class Evolution(object):
     """
@@ -247,8 +246,6 @@ class Request(object):
         if self._property_filter is not None:
             response["property"] = self._property_filter.format()
         return response
-
-    
 
     def get_result_pages(self) -> 'ResultPageList':
         """

@@ -1,4 +1,4 @@
-# Piano analytics (formerly ‘At Internet’) Python client
+# Piano analytics (formerly ‘AT Internet’) Python client
 
 This library enables you to get queries from the Piano Analytics Reporting API v3.
 This is a third-party library.

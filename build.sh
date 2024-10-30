@@ -33,6 +33,8 @@ echo -e "\nThe latest version is $prev_version. New version (without v)? "
 read -r new_version
 git_version="v$new_version"
 git tag "$git_version"
+git push
+git push origin "$git_version"
 
 python3 -m build || exit 1
-python3 -m twine upload dist/* || exit 1
+python3 -m twine upload dist/*-"$new_version"* || exit 1
