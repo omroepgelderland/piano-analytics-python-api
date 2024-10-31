@@ -1,3 +1,8 @@
+"""
+© 2024 Omroep Gelderland
+SPDX-License-Identifier: MIT
+"""
+
 from typing import Optional
 
 

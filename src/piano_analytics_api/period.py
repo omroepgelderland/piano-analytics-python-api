@@ -1,3 +1,8 @@
+"""
+© 2024 Omroep Gelderland
+SPDX-License-Identifier: MIT
+"""
+
 import datetime
 from abc import ABC, abstractmethod
 from typing import Final, Literal, Optional, TypedDict, Union
@@ -25,13 +30,6 @@ RelativeDictType = list[_SingleRelativeDictType]
 PeriodDictType = Union[DayDictType, RelativeDictType]
 
 
-YEAR: Final[Literal["Y"]] = "Y"
-QUARTER: Final[Literal["Q"]] = "Q"
-MONTH: Final[Literal["M"]] = "M"
-WEEK: Final[Literal["W"]] = "W"
-DAY: Final[Literal["D"]] = "D"
-
-
 class Period(ABC):
     """
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/period
@@ -42,7 +40,7 @@ class Period(ABC):
         pass
 
 
-class _AbsolutePeriod(Period):
+class _Absolute(Period):
     """
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/period#absolute-periods
     """
@@ -50,7 +48,7 @@ class _AbsolutePeriod(Period):
     pass
 
 
-class DayPeriod(_AbsolutePeriod):
+class Day(_Absolute):
     """
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/period#absolute-periods
     """
@@ -72,12 +70,12 @@ class DayPeriod(_AbsolutePeriod):
 
     def format(self) -> DayDictType:
         start_str = (
-            self._start.strftime("%Y-%m-%d %H:%M:%S")
+            self._start.strftime("%Y-%m-%dT%H:%M:%S")
             if isinstance(self._start, datetime.datetime)
             else self._start.strftime("%Y-%m-%d")
         )
         end_str = (
-            self._end.strftime("%Y-%m-%d %H:%M:%S")
+            self._end.strftime("%Y-%m-%dT%H:%M:%S")
             if isinstance(self._end, datetime.datetime)
             else self._end.strftime("%Y-%m-%d")
         )
@@ -90,11 +88,12 @@ class DayPeriod(_AbsolutePeriod):
         ]
 
 
-class RelativePeriod(Period):
+class _Relative(Period):
     """
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/period#relative-periods
     """
 
+    @abstractmethod
     def __init__(self, granularity: RelativeGranularity, offset: int):
         """
         :param granularity: Time period.
@@ -107,8 +106,54 @@ class RelativePeriod(Period):
         return [{"type": "R", "granularity": self._granularity, "offset": self._offset}]
 
 
+class RelativeDay(_Relative):
+    def __init__(self, offset: int = 0):
+        """
+        Construct a period of one day.
+        :param offset: Offset relative to the current date. 0 is the current day, -1 is yesterday, etc.
+        """
+        super().__init__("D", offset)
+
+
+class RelativeWeek(_Relative):
+    def __init__(self, offset: int = 0):
+        """
+        Construct a period of one week.
+        :param offset: Offset relative to the current date. 0 is the current week, -1 is last week, etc.
+        """
+        super().__init__("W", offset)
+
+
+class RelativeMonth(_Relative):
+    def __init__(self, offset: int = 0):
+        """
+        Construct a period of one month.
+        :param offset: Offset relative to the current date. 0 is the current month, -1 is the previous month, etc.
+        """
+        super().__init__("M", offset)
+
+
+class RelativeQuarter(_Relative):
+    def __init__(self, offset: int = 0):
+        """
+        Construct a period of one quarter.
+        Offset relative to the current date. 0 is the current quarter, -1 is the previous quarter, etc.
+        :param offset:
+        """
+        super().__init__("Q", offset)
+
+
+class RelativeYear(_Relative):
+    def __init__(self, offset: int = 0):
+        """
+        Construct a period of one year.
+        :param offset: Offset relative to the current date. 0 is the current year, -1 is last year, etc.
+        """
+        super().__init__("Y", offset)
+
+
 def today():
     """
-    Creates a period for only the current day.
+    Creates an absolute period for only the current day.
     """
-    return DayPeriod(datetime.date.today(), datetime.date.today())
+    return Day(datetime.date.today(), datetime.date.today())

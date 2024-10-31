@@ -1,3 +1,8 @@
+"""
+© 2024 Omroep Gelderland
+SPDX-License-Identifier: MIT
+"""
+
 import http.client
 import json
 from typing import Any, Final, Literal, Optional, TypedDict, Union, cast

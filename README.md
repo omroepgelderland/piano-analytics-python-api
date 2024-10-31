@@ -5,7 +5,7 @@ This is a third-party library.
 A subscription to Piano Analytics is required.
 
 ## Requirements ##
-* [Python 3.10](https://www.python.org/downloads/) or higher.
+* [Python 3.9](https://www.python.org/downloads/) or higher.
 
 ## Installation ##
 
@@ -27,13 +27,13 @@ pip3 install piano-analytics-api
    Select a site on the page and copy the id from the address bar.
 
 ```python
-from piano_analytics_api import Client, Request
-import piano_analytics_api.pfilter as pfilter
 import piano_analytics_api.period as period
+import piano_analytics_api.pfilter as pfilter
+from piano_analytics_api import Client, Request
 
-site_id = 0
-access_key = ''
-secret_key = ''
+site_id = 614694
+access_key = ""
+secret_key = ""
 
 # Create API connection
 client = Client(access_key, secret_key)
@@ -42,22 +42,14 @@ client = Client(access_key, secret_key)
 # where the page title is not empty and domain is example.com,
 # ordered by the number of visits from high to low.
 request = Request(
-    client = client,
-    sites = [site_id],
-    columns = [
-        'page',
-        'm_visits'
-    ],
-    period = period.today(),
-    sort = [
-        '-m_visits'
-    ],
-    property_filter = pfilter.ListAnd(
-        pfilter.IsEmpty('page', False),
-        pfilter.Contains('domain',[
-            'example.com',
-            'www.example.com'
-        ])
+    client=client,
+    sites=[site_id],
+    columns=["page", "m_visits"],
+    period=period.today(),
+    sort=["-m_visits"],
+    property_filter=pfilter.ListAnd(
+        pfilter.IsEmpty("page", False),
+        pfilter.Contains("domain", ["example.com", "www.example.com"])
     )
 )
 
@@ -68,8 +60,8 @@ for item in request.get_result_rows():
     i += 1
 
 # Number of results
-print(f'rowcount: {request.get_rowcount()}')
+print(f"rowcount: {request.get_rowcount()}")
 
 # Cumulative metrics for all resulting rows
-print(f'total: {request.get_total()}')
+print(f"total: {request.get_total()}")
 ```

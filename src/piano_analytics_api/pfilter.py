@@ -1,6 +1,11 @@
+"""
+© 2024 Omroep Gelderland
+SPDX-License-Identifier: MIT
+"""
+
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import Any, TypeVar, Union, cast
+from typing import Any, Literal, TypeVar, Union, cast
 
 _ExpressionType = Union[int, str, bool, date, list[int], list[str], list[date]]
 
@@ -186,6 +191,11 @@ class IsUndefined(_Endpoint):
 class IsEmpty(_Endpoint):
     def __init__(self, field: str, expression: bool):
         super().__init__(field, "$empty", expression)
+
+
+class Period(_Endpoint):
+    def __init__(self, field: str, expression: Literal["start", "end", "all"]):
+        super().__init__(field, "$period", expression)
 
 
 T = TypeVar("T")

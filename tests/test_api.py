@@ -1,3 +1,8 @@
+"""
+© 2024 Omroep Gelderland
+SPDX-License-Identifier: MIT
+"""
+
 import datetime
 
 import src.piano_analytics_api.period as period
@@ -10,12 +15,8 @@ def get_max_request():
         client=Client("a", "b"),
         sites=[0],
         columns=["page"],
-        period=period.DayPeriod(
-            datetime.date(1999, 12, 1), datetime.date(1999, 12, 31)
-        ),
-        cmp_period=period.DayPeriod(
-            datetime.date(2000, 12, 1), datetime.date(2000, 12, 31)
-        ),
+        period=period.Day(datetime.date(1999, 12, 1), datetime.date(1999, 12, 31)),
+        cmp_period=period.Day(datetime.date(2000, 12, 1), datetime.date(2000, 12, 31)),
         property_filter=pfilter.ListOr(
             pfilter.ListAnd(
                 pfilter.Contains("page", "a"),
@@ -37,7 +38,7 @@ def test_min_request():
         client=Client("a", "b"),
         sites=[0],
         columns=["page"],
-        period=period.DayPeriod(datetime.date(1999, 12, 31)),
+        period=period.Day(datetime.date(1999, 12, 31)),
     )
     assert request.format() == {
         "space": {"s": [0]},

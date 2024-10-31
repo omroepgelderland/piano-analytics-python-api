@@ -1,3 +1,8 @@
+"""
+© 2024 Omroep Gelderland
+SPDX-License-Identifier: MIT
+"""
+
 from datetime import date
 
 import src.piano_analytics_api.pfilter as pfilter
@@ -74,8 +79,8 @@ def test_str_contains_list():
 
 
 def test_str_not_contains():
-    f = pfilter.NotContains("domain", ["example.org", "www.example.org"])
-    assert f.format() == {"domain": {"$nlk": ["example.org", "www.example.org"]}}
+    f = pfilter.NotContains("domain", "example.org")
+    assert f.format() == {"domain": {"$nlk": "example.org"}}
 
 
 def test_str_not_contains_list():
@@ -176,3 +181,8 @@ def test_is_undefined():
 def test_is_empty():
     f = pfilter.IsEmpty("article_id", True)
     assert f.format() == {"article_id": {"$empty": True}}
+
+
+def test_period():
+    f = pfilter.Period("publication_date", "all")
+    assert f.format() == {"publication_date": {"$period": "all"}}
