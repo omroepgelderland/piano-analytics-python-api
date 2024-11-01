@@ -7,6 +7,8 @@ from abc import ABC, abstractmethod
 from datetime import date
 from typing import Any, Literal, TypeVar, Union, cast
 
+from .exceptions import PianoAnalyticsException
+
 _ExpressionType = Union[int, str, bool, date, list[int], list[str], list[date]]
 
 _ExpressionFormattedType = Union[int, str, bool, list[int], list[str]]
@@ -42,6 +44,7 @@ class _List(Filter):
     def __init__(self, *args: Filter):
         """
         List of filters. Arguments can be endpoints or other filter lists.
+        The list must contain at least one filter.
         """
         self._filters = args
 
@@ -49,8 +52,20 @@ class _List(Filter):
     def _get_operator(self) -> str:
         pass
 
-    def format(self) -> _ListDictType:
-        return {self._get_operator(): self._get_formatted_filters()}
+    def format(self) -> Union[_ListDictType, DictType]:
+        """
+        Formats the filterlist in JSON format.
+        Raises an error if the list does not contain any filters.
+        If the list has only one filter then only that filter is returned.
+
+        :raises PianoAnalyticsException If the list is empty.
+        """
+        if len(self._filters) == 0:
+            raise PianoAnalyticsException("Filterlist cannot be empty")
+        elif len(self._filters) == 1:
+            return self._filters[0].format()
+        else:
+            return {self._get_operator(): self._get_formatted_filters()}
 
     def _get_formatted_filters(self):
         lijst: "list[dict[str, Any]]" = []

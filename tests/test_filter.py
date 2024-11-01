@@ -5,7 +5,10 @@ SPDX-License-Identifier: MIT
 
 from datetime import date
 
+import pytest
+
 import src.piano_analytics_api.pfilter as pfilter
+from src.piano_analytics_api.exceptions import PianoAnalyticsException
 
 
 def test_number_equals():
@@ -186,3 +189,43 @@ def test_is_empty():
 def test_period():
     f = pfilter.Period("publication_date", "all")
     assert f.format() == {"publication_date": {"$period": "all"}}
+
+
+def test_and_list():
+    f = pfilter.ListAnd(
+        pfilter.Equals("page", "index"), pfilter.NotContains("article_id", "wf")
+    )
+    assert f.format() == {
+        "$AND": [{"page": {"$eq": "index"}}, {"article_id": {"$nlk": "wf"}}]
+    }
+
+
+def test_or_list():
+    f = pfilter.ListOr(
+        pfilter.Equals("page", "index"), pfilter.NotContains("article_id", "wf")
+    )
+    assert f.format() == {
+        "$OR": [{"page": {"$eq": "index"}}, {"article_id": {"$nlk": "wf"}}]
+    }
+
+
+def test_and_list_single():
+    f = pfilter.ListAnd(pfilter.Equals("page", "index"))
+    assert f.format() == {"page": {"$eq": "index"}}
+
+
+def test_or_list_single():
+    f = pfilter.ListOr(pfilter.Equals("page", "index"))
+    assert f.format() == {"page": {"$eq": "index"}}
+
+
+def test_empty_and_list():
+    f = pfilter.ListAnd()
+    with pytest.raises(PianoAnalyticsException):
+        f.format()
+
+
+def test_empty_or_list():
+    f = pfilter.ListOr()
+    with pytest.raises(PianoAnalyticsException):
+        f.format()
