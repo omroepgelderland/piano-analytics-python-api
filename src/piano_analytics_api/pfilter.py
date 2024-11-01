@@ -46,7 +46,7 @@ class _List(Filter):
         List of filters. Arguments can be endpoints or other filter lists.
         The list must contain at least one filter.
         """
-        self._filters = args
+        self.filters: list[Filter] = list(args)
 
     @abstractmethod
     def _get_operator(self) -> str:
@@ -60,18 +60,24 @@ class _List(Filter):
 
         :raises PianoAnalyticsException If the list is empty.
         """
-        if len(self._filters) == 0:
+        if len(self.filters) == 0:
             raise PianoAnalyticsException("Filterlist cannot be empty")
-        elif len(self._filters) == 1:
-            return self._filters[0].format()
+        elif len(self.filters) == 1:
+            return self.filters[0].format()
         else:
             return {self._get_operator(): self._get_formatted_filters()}
 
     def _get_formatted_filters(self):
         lijst: "list[dict[str, Any]]" = []
-        for filter in self._filters:
+        for filter in self.filters:
             lijst.append(filter.format())
         return lijst
+    
+    def add(self, fil: Filter):
+        """
+        Add a filter or filterlist to this list
+        """
+        self.filters.append(fil)
 
 
 class ListAnd(_List):

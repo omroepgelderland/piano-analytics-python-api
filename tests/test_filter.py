@@ -229,3 +229,11 @@ def test_empty_or_list():
     f = pfilter.ListOr()
     with pytest.raises(PianoAnalyticsException):
         f.format()
+
+def test_add_list():
+    f = pfilter.ListAnd()
+    f.add(pfilter.Equals("page", "index"))
+    f.add(pfilter.NotContains("article_id", "wf"))
+    assert f.format() == {
+        "$AND": [{"page": {"$eq": "index"}}, {"article_id": {"$nlk": "wf"}}]
+    }
