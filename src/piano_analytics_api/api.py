@@ -245,9 +245,12 @@ class Request(object):
         Serialization without some properties for getRowCount and getTotal queries.
         """
         response = cast(_RequestTotalsType, self.format())
-        del response["sort"]  # type: ignore
-        del response["max-results"]  # type: ignore
-        del response["page-num"]  # type: ignore
+        if "sort" in response:
+            del response["sort"]
+        if "max-results" in response:
+            del response["max-results"]
+        if "page-num" in response:
+            del response["page-num"]
         return response
 
     def _format_filters(self) -> _RequestFiltersType:
