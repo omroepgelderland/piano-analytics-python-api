@@ -13,6 +13,15 @@ projectdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # tempdir="/tmp/dist_$projectnaam/"
 cd "$projectdir" || exit 1
 
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+if [[ $(git rev-parse --abbrev-ref HEAD) != "master" ]]; then
+    echo "Op branch $current_branch ipv master. Toch doorgaan? (j/n)"
+    read -r ans
+    if [[ $ans != "j" ]]; then
+        exit 1
+    fi
+fi
+
 ./set-env.sh || exit 1
 source env/bin/activate || exit 1
 
