@@ -8,10 +8,12 @@ function delete_dist_files() {
         src/piano_analytics_api/_version.py
 }
 
+set -euo pipefail
+
 projectdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # projectnaam="$(basename "$projectdir")"
 # tempdir="/tmp/dist_$projectnaam/"
-cd "$projectdir" || exit 1
+cd "$projectdir"
 
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 if [[ $(git rev-parse --abbrev-ref HEAD) != "master" ]]; then
@@ -22,8 +24,8 @@ if [[ $(git rev-parse --abbrev-ref HEAD) != "master" ]]; then
     fi
 fi
 
-./set-env.sh || exit 1
-source env/bin/activate || exit 1
+./set-env.sh
+source env/bin/activate
 
 if ! git status --porcelain=v1 2>/dev/null | wc -l; then
     git status
@@ -45,5 +47,5 @@ git tag "$git_version"
 git push
 git push origin "$git_version"
 
-python3 -m build || exit 1
-python3 -m twine upload dist/*-"$new_version"* || exit 1
+python3 -m build
+python3 -m twine upload dist/*-"$new_version"*
