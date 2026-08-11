@@ -68,11 +68,11 @@ class _List(Filter):
             return {self._get_operator(): self._get_formatted_filters()}
 
     def _get_formatted_filters(self):
-        lijst: "list[dict[str, Any]]" = []
+        lijst: list[dict[str, Any]] = []
         for filter in self.filters:
             lijst.append(filter.format())
         return lijst
-    
+
     def add(self, fil: Filter):
         """
         Add a filter or filterlist to this list

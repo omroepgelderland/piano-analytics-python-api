@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 import datetime
 from abc import ABC, abstractmethod
-from typing import Final, Literal, Optional, TypedDict, Union
+from typing import Literal, Optional, TypedDict, Union
 
 
 class _SingleDayDictType(TypedDict):
@@ -44,8 +44,6 @@ class _Absolute(Period):
     """
     https://developers.atinternet-solutions.com/piano-analytics/data-api/parameters/period#absolute-periods
     """
-
-    pass
 
 
 class Day(_Absolute):

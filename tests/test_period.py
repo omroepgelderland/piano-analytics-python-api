@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 from datetime import date, datetime
 
-import src.piano_analytics_api.period as period
+from src.piano_analytics_api import period
 
 
 def test_single_day_period():

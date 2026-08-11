@@ -5,9 +5,7 @@ SPDX-License-Identifier: MIT
 
 import datetime
 
-import src.piano_analytics_api.period as period
-import src.piano_analytics_api.pfilter as pfilter
-from src.piano_analytics_api import Client, Evolution, Request
+from src.piano_analytics_api import Client, Evolution, Request, period, pfilter
 
 
 def get_max_request():

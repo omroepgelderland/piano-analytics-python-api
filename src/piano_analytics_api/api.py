@@ -95,12 +95,12 @@ class _RequestTotalsType(_RequestTotalsTypeNotRequired):
 
 
 """Maximum number of results in one page."""
-MAX_PAGE_RESULTS: Final[Literal[10000]] = 10000
+MAX_PAGE_RESULTS: Final = 10000
 """Maximum number of pages in a request."""
-MAX_PAGES: Final[Literal[20]] = 20
+MAX_PAGES: Final = 20
 
 
-class Evolution(object):
+class Evolution:
     """
     @todo implementeren
     """
@@ -109,7 +109,7 @@ class Evolution(object):
         return {}
 
 
-class Client(object):
+class Client:
     def __init__(self, access_key: str, secret_key: str):
         """
         Construct a new API connection.
@@ -170,12 +170,12 @@ class Client(object):
         Returns the headers for API requests.
         """
         return {
-            "x-api-key": "{}_{}".format(self._access_key, self._secret_key),
+            "x-api-key": f"{self._access_key}_{self._secret_key}",
             "Content-type": "application/json",
         }
 
 
-class Request(object):
+class Request:
     """
     The request object contains the parameters for a data query.
     """
@@ -334,7 +334,7 @@ class Request(object):
         return self._get_max_page_results() == 0
 
 
-class ResultPageList(object):
+class ResultPageList:
     """
     Iterable set of pages with data results.
     """

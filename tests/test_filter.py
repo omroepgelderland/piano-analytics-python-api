@@ -7,7 +7,7 @@ from datetime import date
 
 import pytest
 
-import src.piano_analytics_api.pfilter as pfilter
+from src.piano_analytics_api import pfilter
 from src.piano_analytics_api.exceptions import PianoAnalyticsException
 
 
@@ -229,6 +229,7 @@ def test_empty_or_list():
     f = pfilter.ListOr()
     with pytest.raises(PianoAnalyticsException):
         f.format()
+
 
 def test_add_list():
     f = pfilter.ListAnd()

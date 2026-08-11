@@ -49,8 +49,8 @@ request = Request(
     sort=["-m_visits"],
     property_filter=pfilter.ListAnd(
         pfilter.IsEmpty("page", False),
-        pfilter.Contains("domain", ["example.com", "www.example.com"])
-    )
+        pfilter.Contains("domain", ["example.com", "www.example.com"]),
+    ),
 )
 
 # All results

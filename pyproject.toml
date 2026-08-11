@@ -47,3 +47,9 @@ exclude = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/piano_analytics_api"]
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true

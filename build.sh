@@ -24,7 +24,7 @@ if [[ $(git rev-parse --abbrev-ref HEAD) != "master" ]]; then
     fi
 fi
 
-./set-env.sh
+./set-dev-env.sh
 source env/bin/activate
 
 if ! git status --porcelain=v1 2>/dev/null | wc -l; then
@@ -39,7 +39,7 @@ if [[ $head_version != "" ]]; then
     exit 1
 fi
 
-prev_version="$(git tag --list 'v*' --sort=v:refname | tail -n1)"
+prev_version="$(git tag --list 'v*' --sort=v:refname | tail -n1 || :)"
 echo -e "\nThe latest version is $prev_version. New version (without v)? "
 read -r new_version
 git_version="v$new_version"

@@ -11,8 +11,6 @@ class PianoAnalyticsException(Exception):
     General exception for errors within the package.
     """
 
-    pass
-
 
 class APIException(PianoAnalyticsException):
     """
